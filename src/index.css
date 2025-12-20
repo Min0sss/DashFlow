@@ -1,0 +1,46 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    /* Aplicamos el fondo negro carbón y texto blanco suave globalmente */
+    @apply bg-bgDark text-textDark transition-colors duration-300 antialiased;
+  }
+}
+
+#root {
+  /* Aseguramos que el contenedor principal ocupe toda la pantalla */
+  @apply min-h-screen flex flex-col;
+}
+
+/* --- OPTIMIZACIÓN DE SCROLLBARS --- */
+::-webkit-scrollbar {
+  width: 6px; /* Más delgado para un look más elegante */
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-bgDark; /* Fondo igual al de la app */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05); /* Casi invisible por defecto */
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary; /* Resalta en naranja al pasar el mouse */
+}
+
+/* --- CLASES DE UTILIDAD PARA TABLAS --- */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+/* Suavizado para las entradas de Framer Motion */
+.framer-section {
+  will-change: transform, opacity;
+}
