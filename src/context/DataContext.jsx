@@ -227,8 +227,6 @@ export function DataProvider({ children }) {
       date: "2025-12-15",
     }
   ]);
-
-  /* ===================== ORDERS ===================== */
  const [orders, setOrders] = useState([
   {
     id: 1,
@@ -317,8 +315,6 @@ export function DataProvider({ children }) {
     date: "2025-12-18",
   }
 ]);
-
-  /* ===================== LOGS ===================== */
   const [logs, setLogs] = useState([]);
 
   const addLog = (action, detail, user = "Administrator") => {
@@ -332,7 +328,6 @@ export function DataProvider({ children }) {
     setLogs((prev) => [entry, ...prev]);
   };
 
-  /* ===================== CLIENT FUNCTIONS ===================== */
   const addClient = (data) => {
     const nextId = clients.length ? Math.max(...clients.map((c) => c.id)) + 1 : 1;
     const newClient = { id: nextId, ...data };
@@ -353,7 +348,6 @@ export function DataProvider({ children }) {
     addLog("Delete Client", `Client removed: ${c?.name || `ID ${id}`}`);
   };
 
-  /* ===================== PRODUCT FUNCTIONS ===================== */
   const addProduct = (data) => {
     const nextId = products.length ? Math.max(...products.map((p) => p.id)) + 1 : 1;
     const newProduct = {
@@ -378,7 +372,6 @@ export function DataProvider({ children }) {
     addLog("Delete Product", `Product discontinued: ${p?.name || `ID ${id}`}`);
   };
 
-  /* ===================== ORDER FUNCTIONS ===================== */
   const addOrder = (order) => {
     const nextId = orders.length ? Math.max(...orders.map((o) => o.id)) + 1 : 1;
     const newOrder = { id: nextId, ...order };
@@ -391,7 +384,6 @@ export function DataProvider({ children }) {
     addLog("Cancel Order", `Order #${id} was removed from system`);
   };
 
-  /* ===================== EXPORT CONTEXT ===================== */
   return (
     <DataContext.Provider
       value={{

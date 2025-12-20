@@ -42,7 +42,7 @@ export default function DashboardHome() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* KPI Cards */}
+      {}
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {kpis.map((kpi, index) => (
           <motion.div
@@ -65,7 +65,7 @@ export default function DashboardHome() {
         ))}
       </section>
 
-      {/* Analytics Charts */}
+      {}
       <section className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <motion.div
           className="xl:col-span-2 rounded-3xl bg-cardDark border border-white/5 p-8 shadow-2xl"

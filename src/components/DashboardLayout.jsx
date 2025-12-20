@@ -6,7 +6,6 @@ export default function DashboardLayout({ user, onLogout, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const NavLink = ({ to, label }) => {
-    // Verificamos si la ruta actual coincide con el destino
     const isActive = pathname === to || pathname.startsWith(to + "/");
     
     return (
@@ -29,7 +28,7 @@ export default function DashboardLayout({ user, onLogout, children }) {
 
   return (
     <div className="flex min-h-screen bg-bgDark text-textDark font-sans selection:bg-primary/30">
-      {/* SIDEBAR DESKTOP */}
+      {}
       <aside className="hidden md:flex md:flex-col w-72 bg-bgDark border-r border-white/5 shadow-2xl">
         <div className="px-10 py-10">
           <div className="text-3xl font-black tracking-tighter text-primary flex items-center gap-2">
@@ -61,7 +60,7 @@ export default function DashboardLayout({ user, onLogout, children }) {
         </div>
       </aside>
 
-      {/* MOBILE OVERLAY */}
+      {}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md md:hidden transition-opacity"
@@ -69,7 +68,7 @@ export default function DashboardLayout({ user, onLogout, children }) {
         />
       )}
 
-      {/* SIDEBAR MOBILE */}
+      {}
       <aside
         className={`fixed z-[70] inset-y-0 left-0 w-80 bg-bgDark border-r border-white/10 transform transition-all duration-500 ease-in-out md:hidden ${
           mobileOpen ? "translate-x-0 opacity-100 shadow-[0_0_50px_rgba(0,0,0,0.5)]" : "-translate-x-full opacity-0"
@@ -90,7 +89,7 @@ export default function DashboardLayout({ user, onLogout, children }) {
         </nav>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
+      {}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         <header className="sticky top-0 z-50 flex items-center justify-between px-8 py-5 bg-bgDark/60 backdrop-blur-2xl border-b border-white/5">
           <button

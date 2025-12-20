@@ -6,9 +6,6 @@ import autoTable from "jspdf-autotable";
 
 import UserModal from "./UserModal.jsx";
 import ConfirmDelete from "./ConfirmDelete.jsx";
-
-/* Reemplaza o extiende tu array 'initialUsers' con estos datos */
-
 const initialUsers = [
   { 
     id: 1, 

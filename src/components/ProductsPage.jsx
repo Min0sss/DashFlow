@@ -31,7 +31,6 @@ export default function ProductsPage() {
     }
     if (filterCategory !== "All") data = data.filter((p) => p.category === filterCategory);
     if (filterStatus !== "All") {
-        // Mapeo simple para compatibilidad con datos en español si existen
         data = data.filter((p) => (p.status === "Disponible" ? "Available" : "Out of Stock") === filterStatus);
     }
     return data;

@@ -17,7 +17,7 @@ export default function ConfirmDelete({ open, user, onCancel, onConfirm }) {
             exit={{ y: 30, opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
-            {/* Warning Icon Container */}
+            {}
             <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 

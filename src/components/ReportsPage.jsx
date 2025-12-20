@@ -17,8 +17,6 @@ import autoTable from "jspdf-autotable";
 
 export default function ReportsPage() {
   const { orders, clients, products } = useData();
-
-  /* ====================== TOP PRODUCTS ====================== */
   const topProducts = useMemo(() => {
     const map = {};
     orders.forEach((o) => {
@@ -35,8 +33,6 @@ export default function ReportsPage() {
       .sort((a, b) => b.qty - a.qty)
       .slice(0, 5);
   }, [orders]);
-
-  /* ====================== TOP CLIENTS ======================= */
   const topClients = useMemo(() => {
     const map = {};
     orders.forEach((o) => {
@@ -50,8 +46,6 @@ export default function ReportsPage() {
       .sort((a, b) => b.total - a.total)
       .slice(0, 5);
   }, [orders]);
-
-  /* ====================== MONTHLY INCOME ====================== */
   const monthlyIncome = useMemo(() => {
     const map = {};
     orders.forEach((o) => {
@@ -66,28 +60,21 @@ export default function ReportsPage() {
     }));
   }, [orders]);
 
-  /* ====================== ORDER STATUS SUMMARY ====================== */
   const statusSummary = useMemo(() => {
-    // Inicializamos con los estados exactos que manejas
     const map = { Paid: 0, Pending: 0, Canceled: 0 };
     orders.forEach((o) => {
-      // Mapeo flexible para detectar estados en español o inglés
       const status = (o.status === "Pagado" || o.status === "Paid") ? "Paid" : 
                      (o.status === "Pendiente" || o.status === "Pending") ? "Pending" : "Canceled";
       if (map[status] !== undefined) map[status]++;
     });
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [orders]);
-
-  /* ====================== K P I S ====================== */
   const totalIncome = orders.reduce((acc, o) => acc + o.total, 0);
   const totalOrders = orders.length;
   const activeClients = clients.filter((c) => c.status === "Active" || c.status === "Activo").length;
 
-  // Paleta Ámbar corregida (Vibrante)
   const donutColors = ["#f97316", "#fbbf24", "#ef4444"];
 
-  /* ====================== EXPORT PDF ====================== */
   const exportPDF = () => {
     const doc = new jsPDF();
     const date = new Date().toLocaleString();
@@ -134,22 +121,22 @@ export default function ReportsPage() {
         </button>
       </header>
 
-      {/* KPI Section */}
+      {}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <KpiCard title="Total Revenue" value={`$${totalIncome.toFixed(2)}`} icon="💰" />
         <KpiCard title="Registered Orders" value={totalOrders} icon="📦" />
         <KpiCard title="Active Clients" value={activeClients} icon="👥" />
       </section>
 
-      {/* Lists Section */}
+      {}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ListCard title="Best Selling Products" data={topProducts} field="qty" />
         <ListCard title="Top Valuable Clients" data={topClients} field="total" />
       </section>
 
-      {/* Charts Section */}
+      {}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Bar Chart */}
+        {}
         <div className="rounded-3xl p-8 border border-white/5 bg-cardDark shadow-2xl">
           <h3 className="text-xs font-black text-textDark uppercase tracking-[0.2em] mb-8">Monthly Revenue</h3>
           <div className="h-72">
@@ -167,7 +154,7 @@ export default function ReportsPage() {
           </div>
         </div>
 
-        {/* Donut Chart - CORREGIDO */}
+        {}
         <div className="rounded-3xl p-8 border border-white/5 bg-cardDark shadow-2xl">
           <h3 className="text-xs font-black text-textDark uppercase tracking-[0.2em] mb-8">Order Status Distribution</h3>
           <div className="h-72 flex items-center justify-center">
@@ -180,7 +167,7 @@ export default function ReportsPage() {
                   innerRadius={70}
                   outerRadius={100}
                   paddingAngle={8}
-                  stroke="none" // Elimina el borde gris feo
+                  stroke="none" 
                 >
                   {statusSummary.map((entry, i) => (
                     <Cell key={i} fill={donutColors[i % donutColors.length]} />
@@ -204,7 +191,6 @@ export default function ReportsPage() {
   );
 }
 
-/* REUSABLE COMPONENTS */
 function KpiCard({ title, value, icon }) {
   return (
     <div className="p-8 rounded-3xl border border-white/5 bg-cardDark shadow-xl group hover:border-primary/20 transition-all">

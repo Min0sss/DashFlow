@@ -48,7 +48,7 @@ export default function ClientsPage() {
     autoTable(doc, {
       head: [["Name", "Email", "Phone", "Status"]],
       body: filteredClients.map(c => [c.name, c.email, c.phone, c.status]),
-      headStyles: { fillColor: [249, 115, 22] } // Color Naranja Pro
+      headStyles: { fillColor: [249, 115, 22] }
     });
     doc.save("clients_report.pdf");
   };
