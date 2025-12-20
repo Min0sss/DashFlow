@@ -5,22 +5,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Fondos
+
         bgLight: "#f8fafc",
-        bgDark: "#0f0f0f",      // Negro carbón profundo
+        bgDark: "#0f0f0f",      
 
-        // Tarjetas y componentes
         cardLight: "#ffffff",
-        cardDark: "#1a1a1a",    // Gris oscuro para que resalte sobre el fondo
+        cardDark: "#1a1a1a",    
 
-        // Textos
         textLight: "#0f172a",
-        textDark: "#f5f5f5",    // Blanco suave (no puro para no cansar la vista)
-        textMuted: "#9ca3af",   // Gris para textos secundarios
+        textDark: "#f5f5f5",   
+        textMuted: "#9ca3af",   
 
-        // Color de Acento (Naranja / Ámbar)
-        primary: "#f97316",     // Naranja vibrante
-        primaryHover: "#ea580c", // Naranja un poco más oscuro para el hover
+        primary: "#f97316", 
+        primaryHover: "#ea580c", 
       },
     },
   },
