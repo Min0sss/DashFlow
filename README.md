@@ -8,7 +8,7 @@ This project is part of my **front-end professional portfolio** and focuses on c
 
 ## Live Demo
 
-
+https://dash-flow-eight.vercel.app/
 
 ## Features
 
@@ -78,7 +78,7 @@ src/
 
 ```
 # Clone repository
-git clone 
+git clone https://github.com/Min0sss/DashFlow.git
 
 # Install dependencies
 npm install
