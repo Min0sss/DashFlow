@@ -1,43 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-
-    @apply bg-bgDark text-textDark transition-colors duration-300 antialiased;
-  }
+:root {
+  color-scheme: dark;
 }
 
-#root {
-
-  @apply min-h-screen flex flex-col;
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #09090b; /* Base Zinc 950 */
+  color: #f4f4f5;
+  
+  /* AQUI ESTÁ LA MAGIA DE LA ILUMINACIÓN */
+  background-image: 
+    /* Luz Naranja (Esquina superior izquierda) - MÁS INTENSA (0.15) */
+    radial-gradient(circle at 0% 0%, rgba(249, 115, 22, 0.15), transparent 50%),
+    
+    /* Luz Blanca/Azulada (Centro arriba) - EFECTO FOCO */
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 40%),
+    
+    /* Luz Suave (Abajo derecha) */
+    radial-gradient(circle at 100% 50%, rgba(249, 115, 22, 0.1), transparent 50%);
+    
+  background-attachment: fixed;
+  overflow-x: hidden;
 }
 
 ::-webkit-scrollbar {
-  width: 6px; 
-  height: 6px;
+  width: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  @apply bg-bgDark; 
+  background: #09090b;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 100px;
+  background: #27272a;
+  border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary; 
+  background: #f97316;
 }
 
-
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-}
-
-.framer-section {
-  will-change: transform, opacity;
+@layer components {
+  /* Hacemos los inputs un poco más claros para que resalten */
+  input, select, textarea {
+    @apply bg-[#18181b] border border-white/10 rounded-xl text-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none text-white shadow-sm;
+  }
+  
+  /* Mejoramos la legibilidad de los botones */
+  button {
+    @apply transition-all duration-200 font-medium;
+  }
 }

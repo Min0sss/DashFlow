@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { useData } from "../context/DataContext.jsx";
+import { useState, useEffect, useMemo } from "react";
+import { supabase } from "../supabase/client";
 import {
   PieChart,
   Pie,
@@ -16,14 +16,39 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 export default function ReportsPage() {
-  const { orders, clients, products } = useData();
+  const [orders, setOrders] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const [ordersRes, clientsRes] = await Promise.all([
+          supabase.from('orders').select('*'),
+          supabase.from('clients').select('*')
+        ]);
+
+        if (ordersRes.error) throw ordersRes.error;
+        if (clientsRes.error) throw clientsRes.error;
+
+        setOrders(ordersRes.data || []);
+        setClients(clientsRes.data || []);
+      } catch (error) {
+        console.error("Error loading reports data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
   const topProducts = useMemo(() => {
     const map = {};
     orders.forEach((o) => {
+    
       if (o.items && Array.isArray(o.items)) {
         o.items.forEach(item => {
           if (!map[item.name]) map[item.name] = 0;
-          map[item.name] += item.qty;
+          map[item.name] += Number(item.qty);
         });
       }
     });
@@ -33,12 +58,13 @@ export default function ReportsPage() {
       .sort((a, b) => b.qty - a.qty)
       .slice(0, 5);
   }, [orders]);
+
   const topClients = useMemo(() => {
     const map = {};
     orders.forEach((o) => {
-      if (!o.client?.name) return;
-      if (!map[o.client.name]) map[o.client.name] = 0;
-      map[o.client.name] += o.total;
+      const clientName = o.client_name || "Unknown";
+      if (!map[clientName]) map[clientName] = 0;
+      map[clientName] += Number(o.total);
     });
 
     return Object.entries(map)
@@ -46,18 +72,18 @@ export default function ReportsPage() {
       .sort((a, b) => b.total - a.total)
       .slice(0, 5);
   }, [orders]);
+
   const monthlyIncome = useMemo(() => {
     const map = {};
     orders.forEach((o) => {
-      const month = o.date.slice(0, 7); 
+      if (!o.date) return;
+      const month = o.date.slice(0, 7);
       if (!map[month]) map[month] = 0;
-      map[month] += o.total;
+      map[month] += Number(o.total);
     });
-
-    return Object.entries(map).map(([month, total]) => ({
-      month,
-      total,
-    }));
+    return Object.entries(map)
+      .map(([month, total]) => ({ month, total }))
+      .sort((a, b) => a.month.localeCompare(b.month)); 
   }, [orders]);
 
   const statusSummary = useMemo(() => {
@@ -69,8 +95,10 @@ export default function ReportsPage() {
     });
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [orders]);
-  const totalIncome = orders.reduce((acc, o) => acc + o.total, 0);
+
+  const totalIncome = orders.reduce((acc, o) => acc + Number(o.total), 0);
   const totalOrders = orders.length;
+
   const activeClients = clients.filter((c) => c.status === "Active" || c.status === "Activo").length;
 
   const donutColors = ["#f97316", "#fbbf24", "#ef4444"];
@@ -101,6 +129,10 @@ export default function ReportsPage() {
     doc.save("DashFlow_Report.pdf");
   };
 
+  if (loading) {
+    return <div className="p-10 text-center text-textMuted font-bold animate-pulse">Generando Reportes...</div>;
+  }
+
   return (
     <motion.div
       className="space-y-8"
@@ -121,22 +153,18 @@ export default function ReportsPage() {
         </button>
       </header>
 
-      {}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <KpiCard title="Total Revenue" value={`$${totalIncome.toFixed(2)}`} icon="💰" />
         <KpiCard title="Registered Orders" value={totalOrders} icon="📦" />
         <KpiCard title="Active Clients" value={activeClients} icon="👥" />
       </section>
 
-      {}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ListCard title="Best Selling Products" data={topProducts} field="qty" />
         <ListCard title="Top Valuable Clients" data={topClients} field="total" />
       </section>
 
-      {}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {}
         <div className="rounded-3xl p-8 border border-white/5 bg-cardDark shadow-2xl">
           <h3 className="text-xs font-black text-textDark uppercase tracking-[0.2em] mb-8">Monthly Revenue</h3>
           <div className="h-72">
@@ -153,8 +181,6 @@ export default function ReportsPage() {
             </ResponsiveContainer>
           </div>
         </div>
-
-        {}
         <div className="rounded-3xl p-8 border border-white/5 bg-cardDark shadow-2xl">
           <h3 className="text-xs font-black text-textDark uppercase tracking-[0.2em] mb-8">Order Status Distribution</h3>
           <div className="h-72 flex items-center justify-center">
@@ -190,7 +216,6 @@ export default function ReportsPage() {
     </motion.div>
   );
 }
-
 function KpiCard({ title, value, icon }) {
   return (
     <div className="p-8 rounded-3xl border border-white/5 bg-cardDark shadow-xl group hover:border-primary/20 transition-all">
@@ -208,15 +233,58 @@ function ListCard({ title, data, field }) {
     <div className="p-8 rounded-3xl border border-white/5 bg-cardDark shadow-xl">
       <h3 className="text-xs font-black text-textDark uppercase tracking-[0.2em] mb-6">{title}</h3>
       <ul className="space-y-4 font-bold">
-        {data.map((item, i) => (
-          <li key={i} className="flex justify-between items-center group">
-            <span className="text-sm text-textMuted group-hover:text-textDark transition-colors">{item.name}</span>
-            <span className="text-sm text-primary tabular-nums bg-primary/10 px-3 py-1 rounded-lg">
-              {field === "total" ? `$${item[field].toFixed(2)}` : item[field]}
-            </span>
-          </li>
-        ))}
+        {data.length === 0 ? (
+            <li className="text-textMuted text-xs">No data available yet.</li>
+        ) : (
+            data.map((item, i) => (
+            <li key={i} className="flex justify-between items-center group">
+                <span className="text-sm text-textMuted group-hover:text-textDark transition-colors">{item.name}</span>
+                <span className="text-sm text-primary tabular-nums bg-primary/10 px-3 py-1 rounded-lg">
+                {field === "total" ? `$${item[field].toFixed(2)}` : item[field]}
+                </span>
+            </li>
+            ))
+        )}
       </ul>
     </div>
   );
+  // --- COPIA Y PEGA ESTO AL FINAL DE ReportsPage.jsx ---
+
+function KpiCard({ title, value, icon }) {
+  return (
+    <div className="p-8 rounded-[2rem] border border-white/10 bg-cardDark shadow-xl group hover:border-primary/30 transition-all">
+      <div className="flex items-center justify-between mb-6">
+        {/* Título más grande (antes text-[10px], ahora text-sm) */}
+        <span className="text-sm font-bold text-textMuted uppercase tracking-widest">{title}</span>
+        <span className="text-3xl opacity-50 group-hover:opacity-100 transition-opacity scale-110">{icon}</span>
+      </div>
+      {/* Valor GIGANTE (antes text-3xl, ahora text-5xl) */}
+      <p className="text-5xl font-black text-textDark tracking-tighter">{value}</p>
+    </div>
+  );
+}
+
+function ListCard({ title, data, field }) {
+  return (
+    <div className="p-8 rounded-[2rem] border border-white/10 bg-cardDark shadow-xl">
+      {/* Título de lista más grande */}
+      <h3 className="text-sm font-black text-textDark uppercase tracking-[0.2em] mb-8">{title}</h3>
+      <ul className="space-y-6 font-bold">
+        {data.length === 0 ? (
+            <li className="text-textMuted text-sm italic">No data available yet.</li>
+        ) : (
+            data.map((item, i) => (
+            <li key={i} className="flex justify-between items-center group">
+                {/* Items de lista más grandes */}
+                <span className="text-base text-textMuted group-hover:text-white transition-colors">{item.name}</span>
+                <span className="text-base text-primary tabular-nums bg-primary/10 px-4 py-1.5 rounded-lg border border-primary/20">
+                {field === "total" ? `$${item[field].toFixed(2)}` : item[field]}
+                </span>
+            </li>
+            ))
+        )}
+      </ul>
+    </div>
+  );
+}
 }

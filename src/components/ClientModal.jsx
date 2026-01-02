@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ClientModal({ open, mode, initialClient, onClose, onSave }) {
+export default function ClientModal({ open, mode, initialClient, onClose, onSave, isSaving }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -56,7 +56,8 @@ export default function ClientModal({ open, mode, initialClient, onClose, onSave
                 value={formData.name || ""} 
                 onChange={(e) => setFormData({...formData, name: e.target.value})} 
                 placeholder="e.g. John Doe"
-                className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark transition-all" 
+                disabled={isSaving}
+                className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark transition-all disabled:opacity-50" 
               />
             </div>
 
@@ -69,7 +70,8 @@ export default function ClientModal({ open, mode, initialClient, onClose, onSave
                   value={formData.email || ""} 
                   onChange={(e) => setFormData({...formData, email: e.target.value})} 
                   placeholder="john@example.com"
-                  className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark transition-all" 
+                  disabled={isSaving}
+                  className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark transition-all disabled:opacity-50" 
                 />
               </div>
               <div className="space-y-1">
@@ -79,7 +81,8 @@ export default function ClientModal({ open, mode, initialClient, onClose, onSave
                   value={formData.phone || ""} 
                   onChange={(e) => setFormData({...formData, phone: e.target.value})} 
                   placeholder="+51 999..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark transition-all" 
+                  disabled={isSaving}
+                  className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark transition-all disabled:opacity-50" 
                 />
               </div>
             </div>
@@ -91,7 +94,8 @@ export default function ClientModal({ open, mode, initialClient, onClose, onSave
                   type="text" 
                   value={formData.country || ""} 
                   onChange={(e) => setFormData({...formData, country: e.target.value})} 
-                  className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark" 
+                  disabled={isSaving}
+                  className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark disabled:opacity-50" 
                 />
               </div>
               <div className="space-y-1">
@@ -99,7 +103,8 @@ export default function ClientModal({ open, mode, initialClient, onClose, onSave
                 <select 
                   value={formData.status || "Active"} 
                   onChange={(e) => setFormData({...formData, status: e.target.value})} 
-                  className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark cursor-pointer appearance-none"
+                  disabled={isSaving}
+                  className="w-full px-4 py-2.5 rounded-xl bg-bgDark border border-white/10 focus:border-primary outline-none text-sm text-textDark cursor-pointer appearance-none disabled:opacity-50"
                 >
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
@@ -111,15 +116,17 @@ export default function ClientModal({ open, mode, initialClient, onClose, onSave
               <button 
                 type="button" 
                 onClick={onClose} 
-                className="px-5 py-2 text-sm font-medium text-textMuted hover:text-textDark transition-colors"
+                disabled={isSaving}
+                className="px-5 py-2 text-sm font-medium text-textMuted hover:text-textDark transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button 
                 type="submit" 
-                className="px-6 py-2 bg-primary hover:bg-primaryHover text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-primary/20 active:scale-95"
+                disabled={isSaving}
+                className="px-6 py-2 bg-primary hover:bg-primaryHover text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                {mode === "edit" ? "Save Changes" : "Create Client"}
+                {isSaving ? "Saving..." : (mode === "edit" ? "Save Changes" : "Create Client")}
               </button>
             </div>
           </form>

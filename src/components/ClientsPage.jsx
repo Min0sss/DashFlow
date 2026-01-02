@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { useData } from "../context/DataContext.jsx";
+import { supabase } from "../supabase/client"; 
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -9,8 +9,10 @@ import ClientModal from "./ClientModal.jsx";
 import ConfirmDelete from "./ConfirmDelete.jsx";
 
 export default function ClientsPage() {
-  const { clients, addClient, editClient, deleteClient } = useData();
-  
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
@@ -20,14 +22,34 @@ export default function ClientsPage() {
   const [clientToDelete, setClientToDelete] = useState(null);
 
   const statusOptions = ["All", "Active", "Inactive"];
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setClients(data);
+    } catch (error) {
+      console.error("Error fetching clients:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
 
   const filteredClients = useMemo(() => {
     let data = [...clients];
     if (search.trim()) {
       const q = search.toLowerCase();
       data = data.filter(c => 
-        c.name.toLowerCase().includes(q) || 
-        c.email.toLowerCase().includes(q)
+        (c.name || "").toLowerCase().includes(q) || 
+        (c.email || "").toLowerCase().includes(q)
       );
     }
     if (filterStatus !== "All") {
@@ -52,13 +74,60 @@ export default function ClientsPage() {
     });
     doc.save("clients_report.pdf");
   };
-  const handleSaveClient = (data) => {
-    if (modalMode === "add") {
-      addClient({ ...data, lastPurchase: new Date().toISOString().slice(0, 10) });
-    } else {
-      editClient(selectedClient.id, data);
+
+  const handleSaveClient = async (formData) => {
+    setSaving(true);
+    try {
+      if (modalMode === "add") {
+        const { error } = await supabase.from('clients').insert([{
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          country: formData.country,
+          status: formData.status
+        }]);
+        if (error) throw error;
+
+      } else {
+        const { error } = await supabase.from('clients').update({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          country: formData.country,
+          status: formData.status
+        }).eq('id', selectedClient.id);
+        
+        if (error) throw error;
+      }
+
+      await fetchClients();
+      setModalOpen(false);
+
+    } catch (error) {
+      alert("Error: " + error.message);
+    } finally {
+      setSaving(false);
     }
-    setModalOpen(false);
+  };
+
+  const handleDeleteClient = async () => {
+    if (!clientToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('clients')
+        .delete()
+        .eq('id', clientToDelete.id);
+
+      if (error) throw error;
+
+      await fetchClients(); 
+      setConfirmOpen(false);
+      setClientToDelete(null);
+
+    } catch (error) {
+      alert("Error deleting: " + error.message);
+    }
   };
 
   return (
@@ -69,14 +138,12 @@ export default function ClientsPage() {
           <p className="text-sm text-textMuted font-bold uppercase tracking-widest opacity-60">Customer Database</p>
         </div>
         <div className="flex gap-2">
-          {}
           <button onClick={exportExcel} className="px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-bold transition-all">Excel</button>
           <button onClick={exportPDF} className="px-4 py-2 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-bold transition-all">PDF</button>
           <button onClick={() => { setSelectedClient(null); setModalMode("add"); setModalOpen(true); }} className="px-5 py-2 rounded-xl bg-primary hover:bg-primaryHover text-white text-xs font-black shadow-lg shadow-primary/20 transition-all">+ NEW CLIENT</button>
         </div>
       </header>
 
-      {}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-cardDark p-4 rounded-3xl border border-white/5">
         <input
           type="text"
@@ -94,38 +161,50 @@ export default function ClientsPage() {
         </select>
       </section>
 
-      {}
       <div className="bg-cardDark rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
-        <table className="w-full text-left border-separate border-spacing-y-2">
-          <thead>
-            <tr className="text-textMuted text-[10px] uppercase tracking-[0.2em] font-black opacity-50">
-              <th className="px-8 py-4">Client Info</th>
-              <th className="px-8 py-4">Status</th>
-              <th className="px-8 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredClients.map((c) => (
-              <tr key={c.id} className="group hover:bg-white/[0.02] transition-all">
-                <td className="px-8 py-5 rounded-l-2xl border-y border-l border-white/5 font-bold">
-                  <div className="text-textDark text-sm">{c.name}</div>
-                  <div className="text-[10px] text-textMuted opacity-60 font-medium">{c.email}</div>
-                </td>
-                <td className="px-8 py-5 border-y border-white/5">
-                  <span className={`px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${
-                    c.status === "Active" || c.status === "Activo" ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
-                  }`}>
-                    {c.status === "Active" || c.status === "Activo" ? "ACTIVE" : "INACTIVE"}
-                  </span>
-                </td>
-                <td className="px-8 py-5 rounded-r-2xl border-y border-r border-white/5 text-right space-x-4">
-                  <button onClick={() => { setSelectedClient(c); setModalMode("edit"); setModalOpen(true); }} className="text-[10px] font-black uppercase text-textMuted hover:text-primary transition-colors">Edit</button>
-                  <button onClick={() => { setClientToDelete(c); setConfirmOpen(true); }} className="text-[10px] font-black uppercase text-textMuted hover:text-red-500 transition-colors">Delete</button>
-                </td>
+        {loading ? (
+           <div className="p-10 text-center text-textMuted font-bold animate-pulse">Loading clients...</div>
+        ) : (
+          <table className="w-full text-left border-separate border-spacing-y-2">
+            <thead>
+              <tr className="text-textMuted text-[10px] uppercase tracking-[0.2em] font-black opacity-50">
+                <th className="px-8 py-4">Client Info</th>
+                <th className="px-8 py-4">Status</th>
+                <th className="px-8 py-4 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredClients.length === 0 ? (
+                 <tr>
+                   <td colSpan="3" className="px-8 py-8 text-center text-textMuted text-sm font-bold">
+                     No clients found.
+                   </td>
+                 </tr>
+              ) : (
+                filteredClients.map((c) => (
+                  <tr key={c.id} className="group hover:bg-white/[0.02] transition-all">
+                    <td className="px-8 py-5 rounded-l-2xl border-y border-l border-white/5 font-bold">
+                      <div className="text-textDark text-sm">{c.name}</div>
+                      <div className="text-[10px] text-textMuted opacity-60 font-medium">{c.email}</div>
+                      <div className="text-[9px] text-textMuted opacity-40 font-medium">{c.phone} • {c.country}</div>
+                    </td>
+                    <td className="px-8 py-5 border-y border-white/5">
+                      <span className={`px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${
+                        c.status === "Active" || c.status === "Activo" ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
+                      }`}>
+                        {c.status === "Active" || c.status === "Activo" ? "ACTIVE" : "INACTIVE"}
+                      </span>
+                    </td>
+                    <td className="px-8 py-5 rounded-r-2xl border-y border-r border-white/5 text-right space-x-4">
+                      <button onClick={() => { setSelectedClient(c); setModalMode("edit"); setModalOpen(true); }} className="text-[10px] font-black uppercase text-textMuted hover:text-primary transition-colors">Edit</button>
+                      <button onClick={() => { setClientToDelete(c); setConfirmOpen(true); }} className="text-[10px] font-black uppercase text-textMuted hover:text-red-500 transition-colors">Delete</button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
       <ClientModal 
@@ -134,13 +213,14 @@ export default function ClientsPage() {
         initialClient={selectedClient} 
         onClose={() => setModalOpen(false)} 
         onSave={handleSaveClient} 
+        isSaving={saving}
       />
 
       <ConfirmDelete 
         open={confirmOpen} 
         user={clientToDelete} 
         onCancel={() => setConfirmOpen(false)} 
-        onConfirm={() => { deleteClient(clientToDelete.id); setConfirmOpen(false); }} 
+        onConfirm={handleDeleteClient}
       />
     </motion.div>
   );

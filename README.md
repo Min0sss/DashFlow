@@ -1,51 +1,53 @@
-# DashFlow
+# DashFlow - Full Stack ERP System
 
-**DashFlow** is a high-performance **Enterprise Resource Planning (ERP) Dashboard** built to demonstrate advanced frontend architecture. It provides a centralized interface for managing users, clients, inventory, and financial transactions with a focus on data integrity and professional UI/UX.
+**DashFlow** is a modern, high-performance **Full Stack Enterprise Resource Planning (ERP)** application. It provides a centralized interface for managing users, clients, inventory, and financial transactions.
 
-This project is part of my **front-end professional portfolio** and focuses on clean architecture, real-world admin features, and a modern, business-oriented UI.
+Originally a frontend concept, this project has evolved into a fully functional application powered by **Supabase**, featuring real-time database connections, secure authentication, and a professional "Glassmorphism" UI design.
 
 ---
-
 ## Live Demo
 
 https://dash-flow-eight.vercel.app/
 
-## Features
+## ✨ Key Features
 
-- Admin dashboard with KPIs and analytics
-- Users management:
-  - Create, edit and delete users
-  - Search, filters and sorting
-  - Export users to **Excel** and **PDF**
-- Clients management with data export
-- Products management:
-  - Categories, stock and status
-  - Excel / PDF export
-- Orders management:
-  - Multi-product orders
-  - Order status handling
-  - Excel / PDF export
-- Reports and analytics with charts
-- Activity log visualization
-- Dark mode
-- Fully responsive layout
-- Smooth animations and transitions
+### 🔐 Security & Backend
+- **Real Authentication:** Secure Sign Up and Login powered by Supabase Auth.
+- **Cloud Database:** PostgreSQL database hosted on Supabase.
+- **Row Level Security (RLS):** Data protection ensuring users only access authorized information.
+- **Environment Security:** API keys protected via environment variables.
+
+### 📊 Dashboard & Management
+- **Modern UI:** "Hellio" inspired design with Glassmorphism, dark mode, and ambient lighting.
+- **Interactive Analytics:** Real-time charts using Recharts (Area charts, KPIs).
+- **Inventory Control:** Create, edit, and delete products with stock management.
+- **Client & Order Management:** Full CRUD operations for clients and sales orders.
+- **Team Management:** Admin controls to manage staff access.
+
+### 🛠 Tools
+- **Data Export:** Built-in export to **Excel** (.xlsx) and **PDF** for reports.
+- **Responsive Design:** Fully adaptive layout (Mobile/Desktop) with hamburger menu.
 
 ---
 
-## Tech Stack
+## 💻 Tech Stack
 
-* **Core:** React 20 (LTS) & Vite.
-- **React** (Vite)
-- **Tailwind CSS**
-- **Framer Motion**
-- **Context API**
-- **Recharts**
-- **xlsx** (Excel export)
-- **jsPDF** (PDF export)
+**Frontend:**
+- **React 18** (Vite)
+- **Tailwind CSS** (Styling & Dark Mode)
+- **Framer Motion** (Animations & Transitions)
+- **Recharts** (Data Visualization)
+
+**Backend / BaaS:**
+- **Supabase** (PostgreSQL Database)
+- **Supabase Auth** (Authentication)
+
+**Utilities:**
+- **xlsx** (Excel Export)
+- **jsPDF** (PDF Generation)
+- **Lucide React** (Icons)
 
 ---
-
 ## Project Structure
 
 ```bash
@@ -88,15 +90,15 @@ npm run dev
 
 ##  Notes
 
-- This project is frontend-focused.
+- Full Stack Evolution: This project has evolved from a static frontend template to a fully functional application connected to Supabase.
 
-- All data is handled locally using Context API.
+- Real Backend: It no longer uses mock data. All Clients, Products, and Orders are stored in a PostgreSQL database.
 
 - Export features (Excel / PDF) are implemented for demo purposes.
 
-- No backend or authentication services are connected.
+- Security: Implements Row Level Security (RLS) and Authentication (Sign Up / Login) flow.
 
-- Designed to be easily extensible with APIs or backend services.
+- Responsive UI: Features a mobile-optimized layout with a custom hamburger menu and Glassmorphism design system ("Hellio" Style).
 
 ## Author
 

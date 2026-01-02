@@ -1,211 +1,185 @@
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from "recharts";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from "recharts";
+import { supabase } from "../supabase/client";
 
 export default function DashboardHome() {
-  const monthlyData = [
-    { month: "Jan", sales: 12000, expenses: 8000 },
-    { month: "Feb", sales: 14500, expenses: 9000 },
-    { month: "Mar", sales: 16800, expenses: 9200 },
-    { month: "Apr", sales: 15900, expenses: 9400 },
-    { month: "May", sales: 18200, expenses: 11000 },
-    { month: "Jun", sales: 21000, expenses: 12000 },
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    totalOrders: 0,
+    activeClients: 0,
+    avgTicket: 0
+  });
+  const dataChart = [
+    { name: 'Mon', value: 4000 },
+    { name: 'Tue', value: 3000 },
+    { name: 'Wed', value: 5000 },
+    { name: 'Thu', value: 2780 },
+    { name: 'Fri', value: 1890 },
+    { name: 'Sat', value: 2390 },
+    { name: 'Sun', value: 3490 },
   ];
 
-  const users = [
-    { id: 1, name: "John Doe", role: "Analyst", status: "Active", lastLogin: "2025-12-01" },
-    { id: 2, name: "Maria Lopez", role: "Manager", status: "Active", lastLogin: "2025-11-30" },
-    { id: 3, name: "Carlos Diaz", role: "Operator", status: "Suspended", lastLogin: "2025-11-15" },
-    { id: 4, name: "Ana Torres", role: "Analyst", status: "Active", lastLogin: "2025-11-28" },
-  ];
-
-  const kpis = [
-    { label: "Monthly Revenue", value: "$21,000", badge: "+12% vs last month" },
-    { label: "New Users", value: "48", badge: "+9 this month" },
-    { label: "Pending Tasks", value: "17", badge: "5 critical" },
-    { label: "Compliance Rate", value: "92%", badge: "+4 pts" },
-  ];
+  useEffect(() => {
+    const fetchQuickStats = async () => {
+      const { data: orders } = await supabase.from('orders').select('total');
+      const { count: clientsCount } = await supabase.from('clients').select('*', { count: 'exact' });
+      
+      const totalRev = orders?.reduce((acc, o) => acc + o.total, 0) || 0;
+      const totalOrd = orders?.length || 0;
+      
+      setStats({
+        totalRevenue: totalRev,
+        totalOrders: totalOrd,
+        activeClients: clientsCount || 0,
+        avgTicket: totalOrd > 0 ? totalRev / totalOrd : 0
+      });
+    };
+    fetchQuickStats();
+  }, []);
 
   return (
-    <motion.div
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
       className="space-y-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
     >
-      {}
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {kpis.map((kpi, index) => (
-          <motion.div
-            key={kpi.label}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.1 }}
-            className="rounded-3xl bg-cardDark border border-white/5 p-6 shadow-xl"
-          >
-            <p className="text-[10px] font-black text-textMuted uppercase tracking-[0.2em]">{kpi.label}</p>
-            <p className="mt-3 text-4xl font-black text-textDark tracking-tighter">
-              {kpi.value}
-            </p>
-            <div className="mt-4">
-              <span className="inline-flex text-[10px] font-black px-3 py-1.5 rounded-xl bg-primary/10 text-primary border border-primary/10 uppercase tracking-wider">
-                {kpi.badge}
-              </span>
-            </div>
-          </motion.div>
-        ))}
-      </section>
-
-      {}
-      <section className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <motion.div
-          className="xl:col-span-2 rounded-3xl bg-cardDark border border-white/5 p-8 shadow-2xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xs font-black text-textDark uppercase tracking-[0.25em]">Sales Evolution</h2>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary" />
-                <span className="text-[10px] text-textMuted font-bold uppercase">Sales</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-white/10" />
-                <span className="text-[10px] text-textMuted font-bold uppercase">Expenses</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthlyData}>
-                <CartesianGrid stroke="#ffffff05" strokeDasharray="0" vertical={false} />
-                <XAxis dataKey="month" stroke="#4b5563" fontSize={10} fontWeight={800} tickLine={false} axisLine={false} dy={15} />
-                <YAxis stroke="#4b5563" fontSize={10} fontWeight={800} tickLine={false} axisLine={false} />
-                <Tooltip
-                  cursor={{ stroke: 'rgba(249, 115, 22, 0.2)', strokeWidth: 2 }}
-                  contentStyle={{
-                    background: "#0f0f0f",
-                    border: "1px solid rgba(255,255,255,0.05)",
-                    borderRadius: "16px",
-                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5)",
-                    padding: "12px"
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="sales"
-                  stroke="#f97316"
-                  strokeWidth={4}
-                  dot={{ r: 0 }}
-                  activeDot={{ r: 6, fill: "#f97316", stroke: "#0f0f0f", strokeWidth: 3 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="expenses"
-                  stroke="rgba(255,255,255,0.1)"
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="rounded-3xl bg-cardDark border border-white/5 p-8 shadow-2xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xs font-black text-textDark uppercase tracking-[0.25em]">Monthly Revenue</h2>
-          </div>
-
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyData}>
-                <CartesianGrid stroke="#ffffff05" vertical={false} />
-                <XAxis dataKey="month" stroke="#4b5563" fontSize={10} fontWeight={800} axisLine={false} tickLine={false} dy={15} />
-                <Tooltip
-                  cursor={{ fill: 'rgba(255,255,255,0.02)' }}
-                  contentStyle={{
-                    background: "#0f0f0f",
-                    border: "1px solid rgba(255,255,255,0.05)",
-                    borderRadius: "16px"
-                  }}
-                />
-                <Bar dataKey="sales" fill="#f97316" radius={[8, 8, 4, 4]} barSize={24} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Users Section */}
-      <motion.section
-        className="rounded-3xl bg-cardDark border border-white/5 p-8 shadow-2xl"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
-          <div>
-            <h2 className="text-xs font-black text-textDark uppercase tracking-[0.25em]">System Access</h2>
-            <p className="text-[10px] font-bold text-textMuted mt-1 uppercase opacity-60">Real-time user monitoring</p>
-          </div>
-
-          <input
-            type="text"
-            placeholder="Search active sessions..."
-            className="text-[11px] font-bold px-5 py-3 rounded-2xl bg-bgDark border border-white/5 text-textDark outline-none focus:border-primary/50 transition-all w-full md:w-80 shadow-inner"
-          />
+      <div className="flex justify-between items-end mb-4">
+        <div>
+          <h2 className="text-3xl font-black text-white tracking-tight">Dashboard</h2>
+          <p className="text-textMuted text-sm">Overview of your activity - Last 7 days</p>
         </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-separate border-spacing-y-2">
-            <thead>
-              <tr className="text-textMuted text-[9px] uppercase tracking-[0.2em] font-black opacity-50">
-                <th className="pb-4 px-4">User</th>
-                <th className="pb-4 px-4">Permission</th>
-                <th className="pb-4 px-4">Account Status</th>
-                <th className="pb-4 px-4 text-right">Timestamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u.id} className="group transition-all hover:bg-white/[0.02]">
-                  <td className="py-5 px-4 rounded-l-2xl border-y border-l border-white/5 font-black text-textDark text-xs">{u.name}</td>
-                  <td className="py-5 px-4 border-y border-white/5 text-[10px] font-bold text-textMuted uppercase">{u.role}</td>
-                  <td className="py-5 px-4 border-y border-white/5">
-                    <span
-                      className={`px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${
-                        u.status === "Active"
-                          ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/10"
-                          : "bg-red-500/10 text-red-500 border border-red-500/10"
-                      }`}
-                    >
-                      {u.status}
-                    </span>
-                  </td>
-                  <td className="py-5 px-4 rounded-r-2xl border-y border-r border-white/5 text-right text-[10px] font-bold text-textMuted tabular-nums opacity-60">
-                    {u.lastLogin}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="text-xs font-mono text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+          {new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </div>
-      </motion.section>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <GlassCard 
+          title="Total Sales" 
+          value={`$${stats.totalRevenue.toFixed(2)}`} 
+          trend="+12.5%" 
+          isPositive={true} 
+          icon="💰"
+        />
+        <GlassCard 
+          title="Total Orders" 
+          value={stats.totalOrders} 
+          trend="+5.2%" 
+          isPositive={true} 
+          icon="📦"
+        />
+        <GlassCard 
+          title="Active Clients" 
+          value={stats.activeClients} 
+          trend="+2 New" 
+          isPositive={true} 
+          icon="👥"
+        />
+        <GlassCard 
+          title="Avg. Ticket" 
+          value={`$${stats.avgTicket.toFixed(2)}`} 
+          trend="-1.4%" 
+          isPositive={false} 
+          icon="🎟️"
+        />
+      </div>
+      <div className="bg-[#111] border border-white/5 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px]" />
+        
+        <h3 className="text-lg font-bold text-white mb-6 relative z-10">Revenue Analytics</h3>
+        
+        <div className="h-[300px] w-full relative z-10">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={dataChart}>
+              <defs>
+                <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/> {/* Naranja Dashflow */}
+                  <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey="name" stroke="#555" tick={{fill: '#666', fontSize: 12}} axisLine={false} tickLine={false} />
+              <YAxis stroke="#555" tick={{fill: '#666', fontSize: 12}} axisLine={false} tickLine={false} prefix="$" />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#000', border: '1px solid #333', borderRadius: '8px', color: '#fff' }}
+                itemStyle={{ color: '#fff' }}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="value" 
+                stroke="#f97316" 
+                strokeWidth={3}
+                fillOpacity={1} 
+                fill="url(#colorGradient)" 
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </motion.div>
   );
+}
+
+function GlassCard({ title, value, trend, isPositive, icon }) {
+  return (
+    <motion.div 
+      whileHover={{ y: -5 }}
+      className="p-6 rounded-2xl bg-[#111] border border-white/5 relative overflow-hidden group"
+    >
+      <div className="flex justify-between items-start mb-4">
+        <span className="text-textMuted text-xs font-bold uppercase tracking-wider">{title}</span>
+        <span className="text-xl opacity-30 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0">{icon}</span>
+      </div>
+      
+      <div className="flex items-end gap-3">
+        <span className="text-2xl font-black text-white tracking-tight">{value}</span>
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 ${
+          isPositive 
+            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+        }`}>
+          {trend}
+        </span>
+      </div>
+    </motion.div>
+  );
+  // --- AL FINAL DE DashboardHome.jsx ---
+
+function GlassCard({ title, value, trend, isPositive, icon }) {
+  return (
+    <motion.div 
+      whileHover={{ y: -5 }}
+      // Padding más grande (p-8) y borde un poco más visible
+      className="p-8 rounded-[2rem] bg-cardDark border border-white/10 shadow-lg shadow-black/20 relative overflow-hidden group"
+    >
+      <div className="flex justify-between items-start mb-6">
+        {/* Título más legible */}
+        <span className="text-textMuted text-sm font-bold uppercase tracking-wider">{title}</span>
+        <span className="text-2xl opacity-30 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0">{icon}</span>
+      </div>
+      
+      <div className="flex items-end gap-4">
+        {/* Número principal más grande (text-4xl) */}
+        <span className="text-4xl font-black text-white tracking-tight">{value}</span>
+        
+        {/* Etiqueta de tendencia más grande */}
+        <span className={`text-xs font-bold px-2.5 py-1 rounded-lg mb-1.5 border ${
+          isPositive 
+            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+            : 'bg-red-500/10 text-red-400 border-red-500/20'
+        }`}>
+          {trend}
+        </span>
+      </div>
+    </motion.div>
+  );
+}
 }
