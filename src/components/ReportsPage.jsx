@@ -248,17 +248,14 @@ function ListCard({ title, data, field }) {
       </ul>
     </div>
   );
-  // --- COPIA Y PEGA ESTO AL FINAL DE ReportsPage.jsx ---
 
 function KpiCard({ title, value, icon }) {
   return (
     <div className="p-8 rounded-[2rem] border border-white/10 bg-cardDark shadow-xl group hover:border-primary/30 transition-all">
       <div className="flex items-center justify-between mb-6">
-        {/* Título más grande (antes text-[10px], ahora text-sm) */}
         <span className="text-sm font-bold text-textMuted uppercase tracking-widest">{title}</span>
         <span className="text-3xl opacity-50 group-hover:opacity-100 transition-opacity scale-110">{icon}</span>
       </div>
-      {/* Valor GIGANTE (antes text-3xl, ahora text-5xl) */}
       <p className="text-5xl font-black text-textDark tracking-tighter">{value}</p>
     </div>
   );
@@ -267,7 +264,6 @@ function KpiCard({ title, value, icon }) {
 function ListCard({ title, data, field }) {
   return (
     <div className="p-8 rounded-[2rem] border border-white/10 bg-cardDark shadow-xl">
-      {/* Título de lista más grande */}
       <h3 className="text-sm font-black text-textDark uppercase tracking-[0.2em] mb-8">{title}</h3>
       <ul className="space-y-6 font-bold">
         {data.length === 0 ? (
@@ -275,7 +271,6 @@ function ListCard({ title, data, field }) {
         ) : (
             data.map((item, i) => (
             <li key={i} className="flex justify-between items-center group">
-                {/* Items de lista más grandes */}
                 <span className="text-base text-textMuted group-hover:text-white transition-colors">{item.name}</span>
                 <span className="text-base text-primary tabular-nums bg-primary/10 px-4 py-1.5 rounded-lg border border-primary/20">
                 {field === "total" ? `$${item[field].toFixed(2)}` : item[field]}

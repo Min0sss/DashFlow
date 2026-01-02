@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { supabase } from "../supabase/client"; // Conexión a BD
+import { supabase } from "../supabase/client"; 
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -9,10 +9,9 @@ import ProductModal from "./ProductModal.jsx";
 import ConfirmDelete from "./ConfirmDelete.jsx";
 
 export default function ProductsPage() {
-  // 1. Estados Locales y de Carga
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false); // Para el modal
+  const [saving, setSaving] = useState(false); 
 
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
@@ -26,7 +25,6 @@ export default function ProductsPage() {
   const categories = ["All", "Services", "Subscriptions", "Software", "Equipment", "Tools"];
   const statuses = ["All", "Available", "Out of Stock"];
 
-  // 2. Fetch de Productos (READ)
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -48,7 +46,6 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  // 3. Filtrado Local (Igual que antes)
   const filteredProducts = useMemo(() => {
     let data = [...products];
     if (search.trim()) {
@@ -56,13 +53,11 @@ export default function ProductsPage() {
     }
     if (filterCategory !== "All") data = data.filter((p) => p.category === filterCategory);
     if (filterStatus !== "All") {
-        // Mapeamos el valor de BD ("Disponible"/"Agotado") al filtro en inglés
         data = data.filter((p) => (p.status === "Disponible" ? "Available" : "Out of Stock") === filterStatus);
     }
     return data;
   }, [products, search, filterCategory, filterStatus]);
 
-  // 4. Exportar Excel
   const exportToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(filteredProducts);
     const wb = XLSX.utils.book_new();
@@ -70,7 +65,6 @@ export default function ProductsPage() {
     XLSX.writeFile(wb, "products_inventory.xlsx");
   };
 
-  // 5. Exportar PDF
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.text("Inventory Report", 14, 15);
@@ -83,24 +77,21 @@ export default function ProductsPage() {
     doc.save("products_report.pdf");
   };
 
-  // 6. Guardar Producto (CREATE / UPDATE)
   const handleSaveProduct = async (formData) => {
     setSaving(true);
     try {
       if (modalMode === "add") {
-        // INSERT
+
         const { error } = await supabase.from('products').insert([{
           name: formData.name,
           category: formData.category,
           price: formData.price,
           stock: formData.stock,
           status: formData.status
-          // owner_id se pone solo gracias a Supabase
         }]);
         if (error) throw error;
 
       } else {
-        // UPDATE
         const { error } = await supabase.from('products').update({
           name: formData.name,
           category: formData.category,
@@ -112,7 +103,7 @@ export default function ProductsPage() {
         if (error) throw error;
       }
 
-      await fetchProducts(); // Recargar lista
+      await fetchProducts();
       setModalOpen(false);
 
     } catch (error) {
@@ -122,7 +113,6 @@ export default function ProductsPage() {
     }
   };
 
-  // 7. Borrar Producto (DELETE)
   const handleDeleteProduct = async () => {
     if (!productToDelete) return;
     try {

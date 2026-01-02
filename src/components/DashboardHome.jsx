@@ -101,7 +101,7 @@ export default function DashboardHome() {
             <AreaChart data={dataChart}>
               <defs>
                 <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/> {/* Naranja Dashflow */}
+                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
                   <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
                 </linearGradient>
               </defs>
@@ -151,26 +151,24 @@ function GlassCard({ title, value, trend, isPositive, icon }) {
       </div>
     </motion.div>
   );
-  // --- AL FINAL DE DashboardHome.jsx ---
 
 function GlassCard({ title, value, trend, isPositive, icon }) {
   return (
     <motion.div 
       whileHover={{ y: -5 }}
-      // Padding más grande (p-8) y borde un poco más visible
+
       className="p-8 rounded-[2rem] bg-cardDark border border-white/10 shadow-lg shadow-black/20 relative overflow-hidden group"
     >
       <div className="flex justify-between items-start mb-6">
-        {/* Título más legible */}
+
         <span className="text-textMuted text-sm font-bold uppercase tracking-wider">{title}</span>
         <span className="text-2xl opacity-30 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0">{icon}</span>
       </div>
       
       <div className="flex items-end gap-4">
-        {/* Número principal más grande (text-4xl) */}
+
         <span className="text-4xl font-black text-white tracking-tight">{value}</span>
-        
-        {/* Etiqueta de tendencia más grande */}
+
         <span className={`text-xs font-bold px-2.5 py-1 rounded-lg mb-1.5 border ${
           isPositive 
             ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 

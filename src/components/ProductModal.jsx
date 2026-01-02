@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Agregamos 'isSaving' a las props
 export default function ProductModal({ open, mode, initialProduct, onClose, onSave, isSaving }) {
   const [formData, setFormData] = useState({ name: "", category: "Services", price: 0, stock: 0, status: "Disponible" });
 

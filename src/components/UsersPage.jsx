@@ -170,8 +170,6 @@ export default function UsersPage() {
           <button onClick={() => { setModalMode("add"); setSelectedUser(null); setModalOpen(true); }} className="px-4 py-2 rounded-xl bg-primary hover:bg-primaryHover text-white text-xs font-bold">+ New Member</button>
         </div>
       </header>
-
-      {/* Barra de Búsqueda y Filtros */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-cardDark p-4 rounded-2xl border border-white/5">
         <input
           type="text"
@@ -187,8 +185,6 @@ export default function UsersPage() {
           {statuses.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
       </section>
-
-      {/* Tabla */}
       <div className="bg-cardDark rounded-2xl border border-white/5 overflow-hidden min-h-[300px]">
         {loading ? (
           <div className="flex justify-center items-center h-40 text-textMuted text-sm">
@@ -241,7 +237,6 @@ export default function UsersPage() {
 
       <UserModal open={modalOpen} mode={modalMode} initialUser={selectedUser} onClose={() => setModalOpen(false)} onSave={handleSaveUser} isSaving={loading} />
       
-      {/* Aquí conectamos la función real de eliminar */}
       <ConfirmDelete 
         open={confirmOpen} 
         user={userToDelete} 

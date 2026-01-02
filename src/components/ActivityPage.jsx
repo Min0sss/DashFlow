@@ -83,7 +83,6 @@ export default function ActivityPage() {
         </p>
       </div>
 
-      {/* Table Container */}
       <div className="rounded-2xl border border-white/5 bg-cardDark overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left border-collapse">
